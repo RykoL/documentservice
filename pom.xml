@@ -60,6 +60,16 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.harmcrest</groupId>
+            <artifactId>java-harmcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
