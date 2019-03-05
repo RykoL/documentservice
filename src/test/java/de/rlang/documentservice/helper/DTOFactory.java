@@ -15,7 +15,7 @@ public class DTOFactory {
 
     public UserDTO buildUserDTO() {
         return new UserDTO(
-                TestConstants.UserUUID,
+                TestConstants.NULL_UUID,
                 "User",
                 "Test");
     }
