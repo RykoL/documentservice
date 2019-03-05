@@ -6,27 +6,20 @@ import de.rlang.documentservice.service.ProjectService;
 import de.rlang.documentservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/projects")
 public class ProjectController {
 
-    private UserService userService;
-
     private ProjectService projectService;
 
     @Autowired
     public ProjectController(
-            UserService userService,
             ProjectService projectService) {
-
-        this.userService = userService;
         this.projectService = projectService;
     }
 
@@ -35,6 +28,13 @@ public class ProjectController {
         ProjectInformationDTO projectInformationDTO = projectService.createProject(createProjectDTO);
 
         return ResponseEntity.status(201).body(projectInformationDTO);
+    }
+
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+    public ProjectInformationDTO getProjectInformation(@PathVariable("projectId") String projectId) {
+        ProjectInformationDTO projectInformationDTO = new ProjectInformationDTO();
+        projectInformationDTO.setUuid(UUID.fromString(projectId));
+        return projectInformationDTO;
     }
 
 }
