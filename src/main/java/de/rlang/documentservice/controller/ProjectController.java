@@ -31,11 +31,13 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
-    public ProjectInformationDTO getProjectInformation(@PathVariable("projectId") String projectId) {
-        ProjectInformationDTO projectInformationDTO = new ProjectInformationDTO();
-        projectInformationDTO.setUuid(UUID.fromString(projectId));
-        return projectInformationDTO;
+    public ProjectInformationDTO getProjectInformation(@PathVariable("projectId") UUID projectId) {
+        return projectService.getProject(projectId);
     }
 
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
+    public void deleteProject(@PathVariable("proejctId") UUID projectId) {
+        projectService.deleteProject(projectId);
+    }
 }
 
