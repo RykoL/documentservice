@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface ProjectRepository extends CrudRepository<Project, Long> {
     Project findByUuid(UUID uuid);
 
-    List<Project> findAllByUser(User user);
+    List<Project> findAllByCreator(User user);
 }
