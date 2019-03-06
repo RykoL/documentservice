@@ -2,9 +2,13 @@ package de.rlang.documentservice.helper;
 
 import de.rlang.documentservice.model.dto.out.ProjectInformationDTO;
 import de.rlang.documentservice.model.dto.out.UserDTO;
+import de.rlang.documentservice.model.entity.Project;
 import de.rlang.documentservice.model.entity.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.UUID;
 
 @Component
 public class DTOFactory {
@@ -26,5 +30,15 @@ public class DTOFactory {
 
         BeanUtils.copyProperties(userDTO, user);
         return user;
+    }
+
+    public Project builProject(String name, User owner) {
+        Project project = new Project();
+        project.setName(name);
+        project.setId((long)Math.random());
+        project.setUuid(UUID.randomUUID());
+        project.setParticipants(new HashSet<>());
+
+        return project;
     }
 }
