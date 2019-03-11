@@ -26,6 +26,8 @@ public class User {
 
     @PrePersist
     public void fill() {
-        userUuid = UUID.randomUUID();
+        if (userUuid == null) {
+            userUuid = UUID.randomUUID();
+        }
     }
 }
