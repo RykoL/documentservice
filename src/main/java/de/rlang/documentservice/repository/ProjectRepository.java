@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface ProjectRepository extends CrudRepository<Project, Long> {
-    Project findByUuid(UUID uuid);
+    Project findFirstByUuid(UUID uuid);
 
     List<Project> findAllByCreator(User user);
 }
