@@ -54,15 +54,15 @@ public class ProjectServiceTest {
 
     @Before
     public void setUp() {
-        when(userService.getCurrentAuthenticatedUser()).thenReturn(dtoFactory.buildUser());
+        when(userService.getCurrentAuthenticatedUser()).thenReturn(dtoFactory.buildDefaultUser());
     }
 
     @Test
     public void getProject_Returns_Project_By_Id() {
 
-        Project testProject = dtoFactory.builProject("TestProject", dtoFactory.buildUser());
+        Project testProject = dtoFactory.buildProject("TestProject", dtoFactory.buildDefaultUser());
 
-        when(projectRepository.findByUuid(testProject.getUuid())).thenReturn(testProject);
+        when(projectRepository.findFirstByUuid(testProject.getUuid())).thenReturn(testProject);
 
         ProjectInformationDTO projectInformation = projectService.getProject(testProject.getUuid());
 
@@ -76,10 +76,10 @@ public class ProjectServiceTest {
         List<Project> projectList = new ArrayList<>();
 
         for(int i = 0; i < 3; i++) {
-            projectList.add(dtoFactory.builProject("TestProject" + String.valueOf(i), dtoFactory.buildUser()));
+            projectList.add(dtoFactory.buildProject("TestProject" + String.valueOf(i), dtoFactory.buildDefaultUser()));
         }
 
-        when(projectRepository.findAllByCreator(dtoFactory.buildUser())).thenReturn(projectList);
+        when(projectRepository.findAllByCreator(dtoFactory.buildDefaultUser())).thenReturn(projectList);
 
         List<ProjectInformationDTO> projectInformations = projectService.getAllProjects();
 
