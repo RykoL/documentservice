@@ -41,7 +41,7 @@ public class ProjectService {
     }
 
     public ProjectInformationDTO getProject(UUID projectId) {
-        Project p = projectRepository.findByUuid(projectId);
+        Project p = projectRepository.findFirstByUuid(projectId);
 
         return EntityToDTOConverter.ConvertToProjectInformationDTO(p);
     }
@@ -55,8 +55,9 @@ public class ProjectService {
                 .map(EntityToDTOConverter::ConvertToProjectInformationDTO).collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteProject(UUID projectId) {
-        Project project = projectRepository.findByUuid(projectId);
+        Project project = projectRepository.findFirstByUuid(projectId);
 
         if (project != null) {
             projectRepository.delete(project);
