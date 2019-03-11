@@ -3,8 +3,8 @@ package de.rlang.documentservice.controller;
 import de.rlang.documentservice.model.dto.in.CreateProjectDTO;
 import de.rlang.documentservice.model.dto.out.ProjectInformationDTO;
 import de.rlang.documentservice.service.ProjectService;
-import de.rlang.documentservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.web.annotation.ExposableControllerEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +36,10 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
-    public void deleteProject(@PathVariable("proejctId") UUID projectId) {
+    public ResponseEntity deleteProject(@PathVariable("projectId") UUID projectId) throws Exception {
         projectService.deleteProject(projectId);
+
+        return ResponseEntity.status(204).build();
     }
 }
 
