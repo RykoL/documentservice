@@ -1,10 +1,12 @@
 package de.rlang.documentservice.model.dto.in;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+@AllArgsConstructor
 @Data
 public class RegisterDTO {
 
