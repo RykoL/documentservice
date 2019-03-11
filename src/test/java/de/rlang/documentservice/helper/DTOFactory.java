@@ -24,7 +24,7 @@ public class DTOFactory {
                 "Test");
     }
 
-    public User buildUser() {
+    public User buildDefaultUser() {
         UserDTO userDTO = buildUserDTO();
         User user = new User();
 
@@ -32,7 +32,16 @@ public class DTOFactory {
         return user;
     }
 
-    public Project builProject(String name, User owner) {
+    public User buildUserWithRandomUUID() {
+        User user = new User();
+        user.setName("RandomUser");
+        user.setLastName("RandomLastName");
+        user.fill();
+
+        return user;
+    }
+
+    public Project buildProject(String name, User owner) {
         Project project = new Project();
         project.setName(name);
         project.setId((long)Math.random());
