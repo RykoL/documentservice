@@ -17,7 +17,7 @@ public class DTOFactory {
         return new ProjectInformationDTO();
     }
 
-    public UserDTO buildUserDTO() {
+    public UserDTO buildUserDTO(User user) {
         return new UserDTO(
                 TestConstants.NULL_UUID,
                 "User",
@@ -25,10 +25,11 @@ public class DTOFactory {
     }
 
     public User buildDefaultUser() {
-        UserDTO userDTO = buildUserDTO();
         User user = new User();
+        user.setUserUuid(TestConstants.NULL_UUID);
+        user.setName("User");
+        user.setLastName("Test");
 
-        BeanUtils.copyProperties(userDTO, user);
         return user;
     }
 
