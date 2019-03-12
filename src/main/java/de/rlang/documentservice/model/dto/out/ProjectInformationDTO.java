@@ -4,6 +4,7 @@ import de.rlang.documentservice.model.entity.User;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,5 +19,5 @@ public class ProjectInformationDTO {
 
     private LocalDateTime createdAt;
 
-    private Set<UserDTO> participants;
+    private List<UserDTO> participants;
 }
