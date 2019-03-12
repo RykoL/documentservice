@@ -1,23 +1,27 @@
 package de.rlang.documentservice.model.dto.in;
 
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
-@NoArgsConstructor
+@Data
 public class CreateProjectDTO {
 
     public CreateProjectDTO(String name) {
         this.name = name;
     }
 
+    public CreateProjectDTO(String name, List<UserDTO> users) {
+        this.name = name;
+        this.users = users;
+    }
+
     @Length(max = 50)
     @NotNull
     private String name;
 
-    public String getName() {
-        return name;
-    }
+    private List<UserDTO> users;
 }
