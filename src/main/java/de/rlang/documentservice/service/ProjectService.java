@@ -1,5 +1,8 @@
 package de.rlang.documentservice.service;
 
+import de.rlang.documentservice.exception.ForbiddenException;
+import de.rlang.documentservice.exception.ResourceNotFoundException;
+import de.rlang.documentservice.exception.UnauthorizedException;
 import de.rlang.documentservice.model.dto.in.CreateProjectDTO;
 import de.rlang.documentservice.model.dto.out.ProjectInformationDTO;
 import de.rlang.documentservice.model.entity.Project;
@@ -57,10 +60,22 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(UUID projectId) {
+        User currentUser = userService.getCurrentAuthenticatedUser();
+
         Project project = projectRepository.findFirstByUuid(projectId);
 
-        if (project != null) {
-            projectRepository.delete(project);
+        if (currentUser == null) {
+            throw new UnauthorizedException();
         }
+
+        if (currentUser.getUserUuid() != project.getCreator().getUserUuid()) {
+            throw new ForbiddenException();
+        }
+
+        if (project == null) {
+            throw new ResourceNotFoundException();
+        }
+
+        projectRepository.delete(project);
     }
 }
