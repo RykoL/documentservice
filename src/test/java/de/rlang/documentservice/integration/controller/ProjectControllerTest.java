@@ -3,10 +3,12 @@ package de.rlang.documentservice.integration.controller;
 import de.rlang.documentservice.helper.AuthHelper;
 import de.rlang.documentservice.helper.DTOFactory;
 import de.rlang.documentservice.model.dto.in.CreateProjectDTO;
+import de.rlang.documentservice.model.dto.in.UserDTO;
 import de.rlang.documentservice.model.dto.out.ProjectInformationDTO;
 import de.rlang.documentservice.model.entity.Project;
 import de.rlang.documentservice.repository.ProjectRepository;
 import de.rlang.documentservice.repository.UserRepository;
+import de.rlang.documentservice.util.EntityToDTOConverter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
+import java.util.Arrays;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -77,8 +81,27 @@ public class ProjectControllerTest {
 
         assertThat(projectInformationDTO, notNullValue());
         assertThat(projectInformationDTO.getName(), is(createProjectDTO.getName()));
-        assertThat(projectInformationDTO.getCreator(), is(dtoFactory.buildUserDTO()));
+        assertThat(projectInformationDTO.getCreator(), is(dtoFactory.buildUserDTO(dtoFactory.buildDefaultUser())));
 
+    }
+
+    @Test
+    public void createProject_Creates_Project_And_Adds_Participant() {
+        UserDTO[] participants = {
+                EntityToDTOConverter.ConvertToUserDTO(dtoFactory.buildUserWithRandomUUID(), UserDTO.class),
+                EntityToDTOConverter.ConvertToUserDTO(dtoFactory.buildUserWithRandomUUID(), UserDTO.class)
+        };
+
+        CreateProjectDTO createProjectDTO = new CreateProjectDTO("TestProject1", Arrays.asList(participants));
+
+        HttpEntity<CreateProjectDTO> request = new HttpEntity<>(createProjectDTO, authHelper.getAuthHeader());
+        ProjectInformationDTO projectInformationDTO =
+                template.postForObject(serverBaseUri + "/api/v1/projects", request, ProjectInformationDTO.class);
+
+        assertThat(projectInformationDTO, notNullValue());
+        assertThat(projectInformationDTO.getName(), is(createProjectDTO.getName()));
+        assertThat(projectInformationDTO.getCreator(), is(dtoFactory.buildUserDTO(dtoFactory.buildDefaultUser())));
+        assertThat(projectInformationDTO.getParticipants(), not(empty()));
     }
 
     @Test
@@ -119,5 +142,23 @@ public class ProjectControllerTest {
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
         assertThat(sameProject, is(nullValue()));
+    }
+
+    @Test
+    public void deleteProject_Should_Reject_On_Unauthorized_User() {
+        Project project = dtoFactory.buildProject("TestProject3", dtoFactory.buildDefaultUser());
+        projectRepository.save(project);
+
+
+        ResponseEntity response = template.exchange(
+                serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
+                HttpMethod.DELETE,
+                new HttpEntity<Void>(authHelper.getAuthHeader(dtoFactory.buildUserWithRandomUUID())),
+                Void.class);
+
+        Project sameProject = projectRepository.findFirstByUuid(project.getUuid());
+
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+        assertThat(sameProject, not(nullValue()));
     }
 }
