@@ -6,6 +6,7 @@ import de.rlang.documentservice.model.dto.in.CreateProjectDTO;
 import de.rlang.documentservice.model.dto.in.UserDTO;
 import de.rlang.documentservice.model.dto.out.ProjectInformationDTO;
 import de.rlang.documentservice.model.entity.Project;
+import de.rlang.documentservice.model.entity.User;
 import de.rlang.documentservice.repository.ProjectRepository;
 import de.rlang.documentservice.repository.UserRepository;
 import de.rlang.documentservice.util.EntityToDTOConverter;
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -43,6 +45,7 @@ public class ProjectControllerTest {
     @Autowired
     ProjectRepository projectRepository;
 
+    private User defaultUser;
     private AuthHelper authHelper;
     private DTOFactory dtoFactory;
     private String serverBaseUri;
@@ -57,12 +60,13 @@ public class ProjectControllerTest {
     @Before
     public void setUp() {
         serverBaseUri = "http://localhost:" + String.valueOf(port);
-        userRepository.save(dtoFactory.buildDefaultUser());
+        defaultUser = dtoFactory.buildDefaultUser();
+        userRepository.save(defaultUser);
     }
 
     @After
     public void tearDown() {
-        userRepository.delete(dtoFactory.buildDefaultUser());
+        // userRepository.delete(dtoFactory.buildDefaultUser());
     }
 
     @AfterEach
@@ -75,9 +79,22 @@ public class ProjectControllerTest {
 
         CreateProjectDTO createProjectDTO = new CreateProjectDTO("TestProject1");
 
+        for(User user : userRepository.findAll()) {
+            System.out.println(user.getUserUuid());
+        }
+
         HttpEntity<CreateProjectDTO> request = new HttpEntity<>(createProjectDTO, authHelper.getAuthHeader());
-        ProjectInformationDTO projectInformationDTO =
-                template.postForObject(serverBaseUri + "/api/v1/projects", request, ProjectInformationDTO.class);
+
+        ResponseEntity<ProjectInformationDTO> responseEntity =
+                template.exchange(
+                        serverBaseUri + "/api/v1/projects",
+                        HttpMethod.POST,
+                        request,
+                        ProjectInformationDTO.class);
+
+
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.CREATED));
+        ProjectInformationDTO projectInformationDTO = responseEntity.getBody();
 
         assertThat(projectInformationDTO, notNullValue());
         assertThat(projectInformationDTO.getName(), is(createProjectDTO.getName()));
@@ -107,7 +124,7 @@ public class ProjectControllerTest {
     @Test
     public void getProjectInformation_Returns_Correct_Information() {
 
-        Project project = dtoFactory.buildProject("TestProject2", dtoFactory.buildDefaultUser());
+        Project project = dtoFactory.buildProject("TestProject2", defaultUser);
         projectRepository.save(project);
 
         ResponseEntity<ProjectInformationDTO> response = template.exchange(
@@ -122,20 +139,21 @@ public class ProjectControllerTest {
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(projectInformation.getName(), is(project.getName()));
         assertThat(projectInformation.getUuid(), is(project.getUuid()));
-        assertThat(projectInformation.getCreator(), is(project.getCreator()));
+        assertThat(projectInformation.getCreator(),
+                is(EntityToDTOConverter.ConvertToUserDTO(project.getCreator(), de.rlang.documentservice.model.dto.out.UserDTO.class)));
         assertThat(projectInformation.getCreatedAt(), is(project.getCreatedAt()));
     }
 
     @Test
     public void deleteProject_Removes_Project_From_Database() {
-        Project project = dtoFactory.buildProject("TestProject3", dtoFactory.buildDefaultUser());
+        Project project = dtoFactory.buildProject("TestProject3", defaultUser);
         projectRepository.save(project);
 
 
         ResponseEntity response = template.exchange(
                 serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
                 HttpMethod.DELETE,
-                new HttpEntity<Void>(authHelper.getAuthHeader()),
+                new HttpEntity<Void>(authHelper.getAuthHeader(defaultUser)),
                 Void.class);
 
         Project sameProject = projectRepository.findFirstByUuid(project.getUuid());
@@ -146,9 +164,8 @@ public class ProjectControllerTest {
 
     @Test
     public void deleteProject_Should_Reject_On_Unauthorized_User() {
-        Project project = dtoFactory.buildProject("TestProject3", dtoFactory.buildDefaultUser());
+        Project project = dtoFactory.buildProject("TestProject3", defaultUser);
         projectRepository.save(project);
-
 
         ResponseEntity response = template.exchange(
                 serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
