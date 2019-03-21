@@ -48,6 +48,7 @@ public class DTOFactory {
         project.setId((long)Math.random());
         project.setUuid(UUID.randomUUID());
         project.setParticipants(new HashSet<>());
+        project.setCreator(owner);
 
         return project;
     }
