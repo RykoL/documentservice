@@ -24,7 +24,7 @@ public class Project {
 
     String name;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="owner_id")
     User creator;
 
