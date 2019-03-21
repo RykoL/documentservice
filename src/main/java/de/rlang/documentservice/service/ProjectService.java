@@ -68,7 +68,7 @@ public class ProjectService {
             throw new UnauthorizedException();
         }
 
-        if (currentUser.getUserUuid() != project.getCreator().getUserUuid()) {
+        if (!currentUser.getUserUuid().equals(project.getCreator().getUserUuid())) {
             throw new ForbiddenException();
         }
 
