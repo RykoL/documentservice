@@ -167,10 +167,12 @@ public class ProjectControllerTest {
         Project project = dtoFactory.buildProject("TestProject3", defaultUser);
         projectRepository.save(project);
 
+        User randomUser = dtoFactory.buildUserWithRandomUUID();
+        userRepository.save(randomUser);
         ResponseEntity response = template.exchange(
                 serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
                 HttpMethod.DELETE,
-                new HttpEntity<Void>(authHelper.getAuthHeader(dtoFactory.buildUserWithRandomUUID())),
+                new HttpEntity<Void>(authHelper.getAuthHeader(randomUser)),
                 Void.class);
 
         Project sameProject = projectRepository.findFirstByUuid(project.getUuid());
