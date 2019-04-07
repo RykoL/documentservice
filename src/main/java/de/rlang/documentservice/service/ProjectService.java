@@ -44,9 +44,18 @@ public class ProjectService {
     }
 
     public ProjectInformationDTO getProject(UUID projectId) {
+        User currentUser = userService.getCurrentAuthenticatedUser();
+
         Project p = projectRepository.findFirstByUuid(projectId);
 
-        return EntityToDTOConverter.ConvertToProjectInformationDTO(p);
+        if (currentUser == p.getCreator() || p.getParticipants().contains(currentUser)) {
+            return EntityToDTOConverter.ConvertToProjectInformationDTO(p);
+        }
+
+        if (p == null) {
+            throw new ResourceNotFoundException();
+        }
+        throw new ForbiddenException();
     }
 
     public List<ProjectInformationDTO> getAllProjects() {
