@@ -59,29 +59,21 @@ public class ProjectControllerTest {
 
     @Before
     public void setUp() {
-        serverBaseUri = "http://localhost:" + String.valueOf(port);
+        serverBaseUri = "http://localhost:" + port;
         defaultUser = dtoFactory.buildDefaultUser();
         userRepository.save(defaultUser);
     }
 
     @After
     public void tearDown() {
-        // userRepository.delete(dtoFactory.buildDefaultUser());
-    }
-
-    @AfterEach
-    public void clearProjects() {
         projectRepository.deleteAll();
+        userRepository.delete(defaultUser);
     }
 
     @Test
     public void createProject_Creates_Project_in_Database() {
 
         CreateProjectDTO createProjectDTO = new CreateProjectDTO("TestProject1");
-
-        for(User user : userRepository.findAll()) {
-            System.out.println(user.getUserUuid());
-        }
 
         HttpEntity<CreateProjectDTO> request = new HttpEntity<>(createProjectDTO, authHelper.getAuthHeader());
 
@@ -130,7 +122,7 @@ public class ProjectControllerTest {
         ResponseEntity<ProjectInformationDTO> response = template.exchange(
                 serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
                 HttpMethod.GET,
-                new HttpEntity<ProjectInformationDTO>(authHelper.getAuthHeader()),
+                new HttpEntity<ProjectInformationDTO>(authHelper.getAuthHeader(defaultUser)),
                 ProjectInformationDTO.class
         );
 
