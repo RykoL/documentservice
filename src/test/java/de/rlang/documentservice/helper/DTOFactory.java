@@ -13,18 +13,18 @@ import java.util.UUID;
 @Component
 public class DTOFactory {
 
-    public ProjectInformationDTO buildProjectInformationDTO() {
+    public static ProjectInformationDTO buildProjectInformationDTO() {
         return new ProjectInformationDTO();
     }
 
-    public UserDTO buildUserDTO(User user) {
+     public static UserDTO buildUserDTO(User user) {
         return new UserDTO(
                 TestConstants.NULL_UUID,
                 "User",
                 "Test");
     }
 
-    public User buildDefaultUser() {
+    public static User buildDefaultUser() {
         User user = new User();
         user.setUserUuid(TestConstants.NULL_UUID);
         user.setName("User");
@@ -33,7 +33,7 @@ public class DTOFactory {
         return user;
     }
 
-    public User buildUserWithRandomUUID() {
+    public static User buildUserWithRandomUUID() {
         User user = new User();
         user.setName("RandomUser");
         user.setLastName("RandomLastName");
@@ -42,7 +42,7 @@ public class DTOFactory {
         return user;
     }
 
-    public Project buildProject(String name, User owner) {
+    public static Project buildProject(String name, User owner) {
         Project project = new Project();
         project.setName(name);
         project.setId((long)Math.random());

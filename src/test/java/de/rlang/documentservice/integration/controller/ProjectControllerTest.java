@@ -13,7 +13,6 @@ import de.rlang.documentservice.util.EntityToDTOConverter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -47,12 +45,10 @@ public class ProjectControllerTest {
 
     private User defaultUser;
     private AuthHelper authHelper;
-    private DTOFactory dtoFactory;
     private String serverBaseUri;
     private TestRestTemplate template;
 
     public ProjectControllerTest() {
-        dtoFactory = new DTOFactory();
         authHelper = new AuthHelper();
         template = new TestRestTemplate();
     }
@@ -60,14 +56,15 @@ public class ProjectControllerTest {
     @Before
     public void setUp() {
         serverBaseUri = "http://localhost:" + port;
-        defaultUser = dtoFactory.buildDefaultUser();
+        defaultUser = DTOFactory.buildDefaultUser();
         userRepository.save(defaultUser);
     }
 
     @After
     public void tearDown() {
         projectRepository.deleteAll();
-        userRepository.delete(defaultUser);
+        userRepository.deleteAll();
+        // userRepository.delete(defaultUser);
     }
 
     @Test
@@ -90,15 +87,15 @@ public class ProjectControllerTest {
 
         assertThat(projectInformationDTO, notNullValue());
         assertThat(projectInformationDTO.getName(), is(createProjectDTO.getName()));
-        assertThat(projectInformationDTO.getCreator(), is(dtoFactory.buildUserDTO(dtoFactory.buildDefaultUser())));
+        assertThat(projectInformationDTO.getCreator(), is(DTOFactory.buildUserDTO(DTOFactory.buildDefaultUser())));
 
     }
 
     @Test
     public void createProject_Creates_Project_And_Adds_Participant() {
         UserDTO[] participants = {
-                EntityToDTOConverter.ConvertToUserDTO(dtoFactory.buildUserWithRandomUUID(), UserDTO.class),
-                EntityToDTOConverter.ConvertToUserDTO(dtoFactory.buildUserWithRandomUUID(), UserDTO.class)
+                EntityToDTOConverter.ConvertToUserDTO(DTOFactory.buildUserWithRandomUUID(), UserDTO.class),
+                EntityToDTOConverter.ConvertToUserDTO(DTOFactory.buildUserWithRandomUUID(), UserDTO.class)
         };
 
         CreateProjectDTO createProjectDTO = new CreateProjectDTO("TestProject1", Arrays.asList(participants));
@@ -109,14 +106,14 @@ public class ProjectControllerTest {
 
         assertThat(projectInformationDTO, notNullValue());
         assertThat(projectInformationDTO.getName(), is(createProjectDTO.getName()));
-        assertThat(projectInformationDTO.getCreator(), is(dtoFactory.buildUserDTO(dtoFactory.buildDefaultUser())));
+        assertThat(projectInformationDTO.getCreator(), is(DTOFactory.buildUserDTO(DTOFactory.buildDefaultUser())));
         assertThat(projectInformationDTO.getParticipants(), not(empty()));
     }
 
     @Test
     public void getProjectInformation_Returns_Correct_Information() {
 
-        Project project = dtoFactory.buildProject("TestProject2", defaultUser);
+        Project project = DTOFactory.buildProject("TestProject2", defaultUser);
         projectRepository.save(project);
 
         ResponseEntity<ProjectInformationDTO> response = template.exchange(
@@ -138,7 +135,7 @@ public class ProjectControllerTest {
 
     @Test
     public void deleteProject_Removes_Project_From_Database() {
-        Project project = dtoFactory.buildProject("TestProject3", defaultUser);
+        Project project = DTOFactory.buildProject("TestProject3", defaultUser);
         projectRepository.save(project);
 
 
@@ -156,10 +153,10 @@ public class ProjectControllerTest {
 
     @Test
     public void deleteProject_Should_Reject_On_Unauthorized_User() {
-        Project project = dtoFactory.buildProject("TestProject3", defaultUser);
+        Project project = DTOFactory.buildProject("TestProject3", defaultUser);
         projectRepository.save(project);
 
-        User randomUser = dtoFactory.buildUserWithRandomUUID();
+        User randomUser = DTOFactory.buildUserWithRandomUUID();
         userRepository.save(randomUser);
         ResponseEntity response = template.exchange(
                 serverBaseUri + "/api/v1/projects/" + project.getUuid().toString(),
