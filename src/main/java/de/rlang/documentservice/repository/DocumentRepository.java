@@ -1,4 +1,6 @@
 package de.rlang.documentservice.repository;
 
-public class DocumentRepository {
+import org.springframework.data.repository.CrudRepository;
+
+public interface DocumentRepository extends CrudRepository<Object, Long> {
 }
