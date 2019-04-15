@@ -24,7 +24,6 @@ public class Project {
 
     String name;
 
-    // @ManyToOne(cascade = CascadeType.MERGE)
     @ManyToOne
     @JoinColumn(name="owner_id")
     User creator;
@@ -33,6 +32,8 @@ public class Project {
 
     @ManyToMany
     Set<User>  participants;
+
+    Set<Document> documents;
 
     @PrePersist
     public void fill() {
