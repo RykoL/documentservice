@@ -1,6 +1,7 @@
 package de.rlang.documentservice.service;
 
 import de.rlang.documentservice.auth.JWTUser;
+import de.rlang.documentservice.exception.UnauthorizedException;
 import de.rlang.documentservice.model.dto.in.RegisterDTO;
 import de.rlang.documentservice.model.entity.Login;
 import de.rlang.documentservice.model.entity.User;
@@ -52,7 +53,11 @@ public class UserService {
 
     public User getCurrentAuthenticatedUser() {
         JWTUser principal = (JWTUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findFirstByUserUuid(principal.getUserUuid());
+        User user = userRepository.findFirstByUserUuid(principal.getUserUuid());
+        if (user == null) {
+            throw new UnauthorizedException();
+        }
+        return user;
     }
 
     private String encryptPassword(String clearText) {
