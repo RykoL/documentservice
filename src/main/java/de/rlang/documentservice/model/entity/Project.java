@@ -1,6 +1,7 @@
 package de.rlang.documentservice.model.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,12 +29,15 @@ public class Project {
     @JoinColumn(name="owner_id")
     User creator;
 
+    @CreationTimestamp
     LocalDateTime createdAt;
 
     @ManyToMany
     Set<User>  participants;
 
-    Set<Document> documents;
+    @OneToMany
+    @JoinColumn(name = "project_id")
+    private Set<Document> documents;
 
     @PrePersist
     public void fill() {
