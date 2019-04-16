@@ -42,6 +42,12 @@ public class Project {
     @PrePersist
     public void fill() {
         uuid = UUID.randomUUID();
-        participants = new HashSet<User>();
+        if (participants == null) {
+            participants = new HashSet<User>();
+        }
+    }
+
+    public Project() {
+        participants = new HashSet<>();
     }
 }
