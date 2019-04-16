@@ -26,6 +26,6 @@ public class DocumentRevision {
 
     private String storagePath;
 
-    private String comment;
+    private String mimeType;
 
 }
