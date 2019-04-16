@@ -37,6 +37,7 @@ public class ProjectService {
         project.setName(createProjectDTO.getName());
         project.setCreator(currentUser);
         project.setCreatedAt(LocalDateTime.now());
+        project.getParticipants().add(currentUser);
 
         projectRepository.save(project);
 
