@@ -35,7 +35,7 @@ public class Project {
     @ManyToMany
     Set<User>  participants;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "project_id")
     private Set<Document> documents;
 
